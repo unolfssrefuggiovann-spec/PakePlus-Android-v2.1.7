@@ -1,11 +1,222 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus</title>
-    </head>
-    <body>
-        PakePlus
-    </body>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>我们的专属空间</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">❤️ Our Love</div>
+        <ul>
+            <li onclick="switchModule('home')" class="nav-item active" data-target="home">
+                <i class="fas fa-heart"></i> <span>主页</span>
+            </li>
+            <li onclick="switchModule('album')" class="nav-item" data-target="album">
+                <i class="fas fa-images"></i> <span>相册</span>
+            </li>
+            <li onclick="switchModule('todo')" class="nav-item" data-target="todo">
+                <i class="fas fa-clipboard-check"></i> <span>备忘录</span>
+            </li>
+            <li onclick="switchModule('kitchen')" class="nav-item" data-target="kitchen">
+                <i class="fas fa-utensils"></i> <span>厨房</span>
+            </li>
+            <li onclick="switchModule('anniversary')" class="nav-item" data-target="anniversary">
+                <i class="fas fa-calendar-alt"></i> <span>纪念日</span>
+            </li>
+            <li onclick="switchModule('health')" class="nav-item" data-target="health">
+                <i class="fas fa-notes-medical"></i> <span>健康</span>
+            </li>
+            <li onclick="switchModule('sync')" class="nav-item" data-target="sync">
+                <i class="fas fa-cloud"></i> <span>云同步</span>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        
+        <section id="home" class="module active-module">
+            <div class="hero">
+                <div class="heart-bg"></div>
+                <div class="timer-container">
+                    <h1>我们已经相爱了</h1>
+                    <div id="timer-display" class="timer">0 天 0 小时 0 分</div>
+                    <div id="love-quote" class="love-quote">"每一个和你在一起的日子，都是奇迹。"</div>
+                </div>
+                
+                <div class="settings-toggle" onclick="HomeModule.toggleSettings()">
+                    <i class="fas fa-cog"></i> 设置起始日
+                </div>
+                <div id="home-settings" class="settings-panel hidden">
+                    <p>选择恋爱开始日期：</p>
+                    <input type="date" id="start-date-picker">
+                </div>
+            </div>
+        </section>
+
+        <section id="album" class="module">
+            <div class="header-row">
+                <h2>📖 时间之书</h2>
+            </div>
+            <div class="book-container">
+                <div id="book" class="book">
+                    </div>
+            </div>
+            <div class="controls">
+                <button class="btn" onclick="AlbumModule.prevPage()"><i class="fas fa-arrow-left"></i> 上一页</button>
+                <button class="btn-primary" onclick="AlbumModule.addPhoto()">+ 添加照片</button>
+                <button class="btn" onclick="AlbumModule.nextPage()">下一页 <i class="fas fa-arrow-right"></i></button>
+            </div>
+            <div class="page-indicator" id="page-indicator">第 1 页</div>
+        </section>
+
+        <section id="todo" class="module">
+            <h2>📝 重要事件提醒</h2>
+            <div class="card">
+                <div class="input-group">
+                    <input type="text" id="todo-input" placeholder="要做什么？(标题)">
+                    
+                    <textarea id="todo-remark" placeholder="备注信息 (可选，如：记得带身份证)" rows="2" style="resize:none; margin-top:5px; padding:10px; border-radius:8px; border:1px solid #eee; width:100%; background:#fafafa;"></textarea>
+
+                    <input type="datetime-local" id="todo-time">
+                    
+                    <select id="todo-type">
+                        <option value="normal">🔔 普通通知 (无声)</option>
+                        <option value="alarm">⏰ 闹钟提醒 (铃声+震动)</option>
+                    </select>
+
+                    <select id="todo-remind">
+                        <option value="-1">🔕 不提醒</option>
+                        <option value="0">⚡ 准时提醒 (不提前)</option>
+                        <option value="10" selected>🕒 提前10分钟</option>
+                        <option value="30">🕒 提前30分钟</option>
+                        <option value="60">🕒 提前1小时</option>
+                        <option value="1440">🕒 提前1天</option>
+                    </select>
+                </div>
+                <button class="btn-primary full-width" onclick="TodoModule.add()">添加待办</button>
+                <button class="btn full-width" onclick="TodoModule.requestPermission()" style="margin-top:5px; font-size:12px;">🔔 开启通知权限 (使用闹钟必点)</button>
+            </div>
+            <div id="todo-list" class="todo-list">
+                </div>
+        </section>
+
+        <section id="kitchen" class="module">
+            <h2>🍳 专属厨房</h2>
+            <div class="kitchen-layout">
+                <div class="category-scroll">
+                    <div class="category-list" id="category-list-container"></div>
+                    <button class="add-cat-btn" onclick="KitchenModule.manageCategories()">⚙️ 管理</button>
+                </div>
+                <div class="recipe-container" id="recipe-list"></div>
+            </div>
+            <button class="fab" onclick="KitchenModule.addRecipe()">+</button>
+        </section>
+
+        <section id="anniversary" class="module">
+            <h2>📅 纪念日提醒</h2>
+            <div class="add-event-box card">
+                <h3>新增纪念日</h3>
+                <div class="input-group">
+                    <input type="text" id="anni-name" placeholder="名称 (如: 恋爱)">
+                    <label style="font-size:12px; color:#666;">起始日期 (哪一年开始的):</label>
+                    <input type="date" id="anni-date">
+                </div>
+                <button class="btn-primary full-width" onclick="AnniversaryModule.add()">添加纪念日</button>
+            </div>
+            <ul id="anni-list" class="anni-list"></ul>
+        </section>
+
+        <section id="health" class="module">
+            <h2>🏥 健康档案</h2>
+            <div class="health-grid">
+                <div class="card">
+                    <h3>👩 生理期记录</h3>
+                    <div class="period-setup">
+                        <div class="input-row">
+                            <label>上次首日: <input type="date" id="last-period-date" onchange="HealthModule.updatePeriod()"></label>
+                        </div>
+                        <div class="input-row">
+                            <label>行经天数: <input type="number" id="period-duration" value="5" onchange="HealthModule.updatePeriod()"></label>
+                            <label>周期长度: <input type="number" id="cycle-length" value="28" onchange="HealthModule.updatePeriod()"></label>
+                        </div>
+                    </div>
+                    <div id="calendar-grid" class="calendar-grid"></div>
+                    <div class="legend">
+                        <span><i class="dot period"></i>经期</span>
+                        <span><i class="dot ovulation"></i>排卵</span>
+                        <span><i class="dot predict"></i>预测</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>⚖️ 体重记录</h3>
+                    <div class="weight-input">
+                        <input type="date" id="weight-date">
+                        <input type="number" id="weight-val" placeholder="体重(kg)" step="0.1">
+                        <button class="btn-primary" onclick="HealthModule.addWeight()">记录</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="weightChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sync" class="module">
+            <h2>☁️ 双人云同步 (坚果云)</h2>
+            <div class="card">
+                <div class="sync-intro">
+                    <p>💡 <b>使用说明：</b><br>一人添加记录后点击“上传”，另一人点击“下载”即可同步。<br>请务必使用同一个坚果云账号。</p>
+                </div>
+                
+                <div id="sync-login-panel">
+                    <h3>🔐 账号配置</h3>
+                    <input type="email" id="sync-email" placeholder="坚果云账号 (邮箱)">
+                    <input type="password" id="sync-password" placeholder="应用专用密码 (非登录密码)">
+                    <div style="font-size:12px; color:#888; margin:5px 0;">
+                        * 请在坚果云网页版"安全选项"中生成应用密码
+                    </div>
+                    <button class="btn-primary full-width" onclick="SyncModule.saveConfig()">保存配置</button>
+                </div>
+
+                <div id="sync-action-panel" class="hidden" style="margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+                    <h3>📡 数据传输</h3>
+                    <p style="font-size:12px; color:#666; margin-bottom:10px;">当前状态: <span id="sync-status">✅ 已配置</span></p>
+                    
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-primary" style="flex:1; background:#4CAF50;" onclick="SyncModule.uploadData()">
+                            ⬆️ 上传覆盖云端
+                        </button>
+                        <button class="btn-primary" style="flex:1; background:#2196F3;" onclick="SyncModule.downloadData()">
+                            ⬇️ 下载覆盖本地
+                        </button>
+                    </div>
+                    <div id="sync-log" class="sync-log"></div>
+                    
+                    <button class="btn full-width" style="margin-top:15px; color:#999;" onclick="SyncModule.logout()">退出登录</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <div id="lightbox" class="lightbox hidden" onclick="this.classList.add('hidden')">
+        <img id="lightbox-img" src="" alt="Full View">
+        <div id="lightbox-caption" class="lightbox-caption"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
 </html>
